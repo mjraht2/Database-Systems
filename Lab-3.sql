@@ -219,3 +219,6 @@ SELECT *
 FROM customers
 WHERE cid = 'C005';
 
+-- Matthew Rahtelli
+-- February 9, 2016
+-- Lab 3
