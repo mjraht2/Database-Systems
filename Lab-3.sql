@@ -184,37 +184,51 @@ INSERT INTO Orders( ordnum, mon, cid, aid, pid, qty, totalUSD )
 -- SQL statements for displaying example data into the CAP3 database
 -- Connect to your Postgres server and set the active database to CAP3. Then . . .
 
+-- #1 - List the order number and total dollars of all orders
 SELECT ordnum, totalUSD
 FROM orders;
 
+-- #2  - List the name and city of agents named Smith
 SELECT name, city
 FROM agents
 WHERE name = 'Smith';
 
+-- #3 - List the id, name, and priceUSD of products with quantity more than 208,000
 SELECT pid, name, priceUSD
 FROM products
 WHERE quantity > 208000; 
 
+-- #4 - List the names and cities of customers in Dallas
 SELECT name, city
 FROM customers
 WHERE city = 'Dallas'; 
 
+-- #5 - List the names of agents not in New York and not in Tokyo
 SELECT name
 FROM agents
-WHERE city != 'New York' AND city != 'Tokyo';
+WHERE city != 'New York' 
+  AND city != 'Tokyo';
 
+-- #6 - List all data for products not in Dallas or Duluth that cost US$1 or more
 SELECT *
 FROM products
-WHERE (city != 'Dallas' OR city != 'Duluth') AND priceusd >= 1;
+WHERE (city != 'Dallas' 
+  OR city != 'Duluth') 
+    AND priceusd >= 1;
 
+-- #7 - List all data for orders in January or March
 SELECT *
 FROM orders
-WHERE mon = 'jan' OR mon = 'mar';
+WHERE mon = 'jan' 
+  OR mon = 'mar';
 
+-- #8 - List all data for orders in February less than us$500
 SELECT *
 FROM orders 
-WHERE mon = 'feb' AND totalusd < 500;
+WHERE mon = 'feb' 
+  AND totalusd < 500;
 
+-- #9 - List all orders from the customer whose cid is C005
 SELECT *
 FROM customers
 WHERE cid = 'C005';
