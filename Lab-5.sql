@@ -11,7 +11,7 @@
 -- Tested on Postgres 9.3.2    (For earlier versions, you may need
 --   to remove the "if exists" clause from the DROP TABLE commands.)
 ----------------------------------------------------------------------------------------
-
+ 
 -- Connect to your Postgres server and set the active database to CAP3. Then . . .
 
 DROP TABLE IF EXISTS orders;
