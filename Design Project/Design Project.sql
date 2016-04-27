@@ -182,7 +182,7 @@ CREATE TABLE Weapons (
   WID      char(4) not null,
   NAME     TEXT,
   Description TEXT,
-  Rating   Char(8) NOT NULL,
+  Rating   INTEGER NOT NULL,
   Cost     CHAR(8) NOT NULL,
  primary key(WID)
 );
@@ -207,6 +207,7 @@ INSERT INTO Weapons(WID, Name, Description, Rating, Cost)
   VALUES ('108', 'Thermal Detonator', 'Deadly explosive device', '6', '350');
 INSERT INTO Weapons(WID, Name, Description, Rating, Cost)
   VALUES ('109', 'Electrostaff', 'Electrified pole-like melee weapon', '7', '400');
+
 
 CREATE TABLE LightWeapons (
   WID     char(8) not NULL REFERENCES Weapons(WID),
@@ -250,7 +251,7 @@ CREATE TABLE Armor (
   AID      char(4) not null,
   NAME     TEXT,
   Description TEXT,
-  Rating   Char(8) NOT NULL,
+  Rating   INT NOT NULL,
   Cost     CHAR(8) NOT NULL,
  primary key(AID)
 );
@@ -411,7 +412,7 @@ CREATE TABLE Items (
   INID        char(4) not null,
   NAME        TEXT,
   Description TEXT,
-  Cost        Char(8) NOT NULL,
+  Cost        INTEGER NOT NULL,
  primary key(INID)
 );
 
@@ -429,7 +430,7 @@ INSERT INTO Items(INID, NAME, Description, COST)
   VALUES ('505', 'Antidote Kit', 'Removes any poison from your body', '100');
 INSERT INTO Items(INID, NAME, Description, COST)
   VALUES ('506', 'Computer Spike', 'Enables to easily hack into a computer', '125');
-  
+
 
 CREATE TABLE Inventory (
   ID      char(4) not null REFERENCEs Character(ID),
@@ -493,6 +494,93 @@ INSERT INTO Inventory(ID, INID)
   VALUES ('010', '506');
 INSERT INTO Inventory(ID, INID)
   VALUES ('010', '503');
+  
+--view all weapons and armor--
+DROP VIEW IF EXISTS AllEquipment
+CREATE VIEW AllEquipment AS
+SELECT w.name AS name, a.name AS Aname
+FROM Weapons w, Armor a, Equipment e
+WHERE w.wid = e.wid
+AND   a.aid = e.aid
 
 Select *
-From inventory;
+From AllEquipment;
+
+--view all species and types--
+DROP VIEW IF EXISTS SpeciesTypes
+CREATE VIEW SpeciesTypes AS
+Select s.name AS Sname, t.name AS tname
+FROM Species s, Type t, character c
+WHERE s.id = c.id
+AND t.id = c.id
+
+SELECT *
+FROM SpeciesTypes;
+
+--weapon with the highest rating--
+SELECT w.name AS wname, w.rating as wrating
+FROM weapons w
+ORDER BY Rating DESC
+limit 1;
+
+--item that costs the most money--
+SELECT i.name AS iname, i.cost as icost
+FROM items i
+ORDER BY cost DESC
+limit 1;
+
+--procedure that returns the character's type--
+CREATE or REPLACE FUNCTION CharacterType(TEXT, REFCURSOR) RETURNS REFCURSOR AS $$
+DECLARE
+  Player TEXT		:=$1;
+  ResultSet REFCURSOR   :=$2;
+  
+BEGIN
+  OPEN ResultSet FOR
+  SELECT c.firstname, c.lastname, t.name
+  FROM type t, character c
+  WHERE t.id = c.id
+  AND name = Player;
+RETURN ResultSet;
+END;
+$$
+LANGUAGE plpgsql;
+
+--test stored procedure--
+SELECT CharacterType('Scavenger', 'results');
+FETCH ALL FROM results;
+
+--store procedure that returns the character's species--
+CREATE or REPLACE FUNCTION SpeciesType(TEXT, REFCURSOR) RETURNS REFCURSOR AS $$
+DECLARE
+  Race TEXT		:=$1;
+  ResultSet REFCURSOR   :=$2;
+  
+BEGIN
+  OPEN ResultSet FOR
+  SELECT c.firstname, c.lastname, s.name
+  FROM Species s, character c
+  WHERE s.id = c.id
+  AND name = Race;
+RETURN ResultSet;
+END;
+$$
+LANGUAGE plpgsql;
+
+--test stored procedure--
+SELECT SpeciesType('Human', 'results');
+FETCH ALL FROM results;
+
+--creates admin--
+CREATE ROLE admin;
+
+GRANT SELECT, DELETE, UPDATE, INSERT
+ON ALL TABLES IN SCHEMA public
+TO admin;
+
+--creates user--
+CREATE ROLE OTHER;
+
+GRANT SELECT
+ON ALL TABLES IN SCHEMA public
+TO OTHER;
